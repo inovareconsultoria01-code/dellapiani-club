@@ -1,9 +1,106 @@
-const metas=[{valor:100000,premio:"Moto elétrica"},{valor:200000,premio:"Smartphone premium"},{valor:500000,premio:"Viagem internacional para casal"},{valor:1500000,premio:"Carro elétrico básico"},{valor:4000000,premio:"Carro elétrico de luxo"}];
-function seed(){if(!localStorage.getItem("clientesDellapiani")){localStorage.setItem("clientesDellapiani",JSON.stringify([{nome:"Cliente Exemplo",documento:"00000000000",pontos:12500,compras:180000},{nome:"Arquitetura Prime",documento:"11111111111",pontos:36500,compras:510000},{nome:"Construtora Recife",documento:"22222222222",pontos:82000,compras:1520000}]))}if(!localStorage.getItem("promosDellapiani")){localStorage.setItem("promosDellapiani",JSON.stringify([{titulo:"Black Premium",desc:"Compre produtos participantes e avance em metas para conquistar grandes benefícios.",pontos:10000},{titulo:"Semana do Arquiteto",desc:"Condições especiais para escritórios parceiros e profissionais especificadores.",pontos:3000},{titulo:"Cashback Revestimentos",desc:"Pontos extras em linhas selecionadas de acabamento, porcelanato e revestimentos.",pontos:5000}]))}}
-function limparDoc(v){return(v||"").replace(/\D/g,"")}function dinheiro(v){return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}function pontos(v){return Number(v||0).toLocaleString("pt-BR")+" pts"}
-function carregarPromos(){const promos=JSON.parse(localStorage.getItem("promosDellapiani")||"[]");document.getElementById("statPromos").innerText=promos.length;document.getElementById("promocoesGrid").innerHTML=promos.map(p=>`<article class="promo-card"><span class="tag">${pontos(p.pontos)}</span><h3>${p.titulo}</h3><p class="muted">${p.desc}</p><a class="btn btn-dark" href="#pontos">Consultar elegibilidade</a></article>`).join("")}
-function carregarRanking(){const clientes=JSON.parse(localStorage.getItem("clientesDellapiani")||"[]").sort((a,b)=>b.pontos-a.pontos);document.getElementById("rankingBody").innerHTML=clientes.map((c,i)=>`<tr><td>#${i+1}</td><td><b>${c.nome}</b></td><td>${pontos(c.pontos)}</td><td>${dinheiro(c.compras)}</td><td>${c.compras>=500000?"Premium":"Ativo"}</td></tr>`).join("")}
-function salvarCliente(){const clientes=JSON.parse(localStorage.getItem("clientesDellapiani")||"[]");const novo={nome:document.getElementById("nome").value.trim(),documento:limparDoc(document.getElementById("documento").value),pontos:Number(document.getElementById("pontos").value||0),compras:Number(document.getElementById("compras").value||0)};if(!novo.nome||!novo.documento){alert("Preencha nome e CPF/CNPJ.");return}const idx=clientes.findIndex(c=>c.documento===novo.documento);if(idx>=0)clientes[idx]=novo;else clientes.push(novo);localStorage.setItem("clientesDellapiani",JSON.stringify(clientes));carregarRanking();alert("Cliente salvo com sucesso!")}
-function salvarPromo(){const promos=JSON.parse(localStorage.getItem("promosDellapiani")||"[]");const nova={titulo:document.getElementById("tituloPromo").value.trim(),desc:document.getElementById("descPromo").value.trim(),pontos:Number(document.getElementById("pontosPromo").value||0)};if(!nova.titulo){alert("Informe o título da promoção.");return}promos.push(nova);localStorage.setItem("promosDellapiani",JSON.stringify(promos));carregarPromos();alert("Promoção salva com sucesso!")}
-function buscarCliente(){const doc=limparDoc(document.getElementById("docCliente").value);const clientes=JSON.parse(localStorage.getItem("clientesDellapiani")||"[]");const cliente=clientes.find(c=>c.documento===doc);const box=document.getElementById("clienteResultado");if(!cliente){box.innerHTML=`<p><b>Cadastro não encontrado.</b><br><span class="muted">Fale com um consultor para atualizar seu cadastro e pontos.</span></p>`;return}const proxima=metas.find(m=>cliente.compras<m.valor)||metas[metas.length-1];const faltam=Math.max(0,proxima.valor-cliente.compras);const perc=Math.min(100,(cliente.compras/proxima.valor)*100);document.getElementById("dashPontos").innerText=pontos(cliente.pontos);document.getElementById("dashCompras").innerText=dinheiro(cliente.compras);document.getElementById("dashMeta").innerText=dinheiro(proxima.valor);document.getElementById("dashBar").style.width=perc+"%";document.getElementById("dashFalta").innerText=`Faltam ${dinheiro(faltam)} para ${proxima.premio}.`;document.getElementById("heroPoints").innerText=pontos(cliente.pontos);box.innerHTML=`<h3>Olá, ${cliente.nome}</h3><p><b>Saldo:</b> ${pontos(cliente.pontos)}</p><p><b>Compras acumuladas:</b> ${dinheiro(cliente.compras)}</p><p><b>Próxima conquista:</b> ${proxima.premio}</p><a class="btn btn-gold" href="https://wa.me/5581999999999" target="_blank">Solicitar atendimento</a>`}
-seed();carregarPromos();carregarRanking();
+const metas=[{valor:100000,premio:"Moto elétrica"},{valor:200000,premio:"iPhone / Smartphone Premium"},{valor:500000,premio:"Viagem internacional"},{valor:1500000,premio:"Carro elétrico básico"},{valor:4000000,premio:"Carro elétrico luxo"}];
+
+function init(){
+ if(!localStorage.getItem("dc_clientes")){
+  localStorage.setItem("dc_clientes",JSON.stringify([
+   {nome:"Cliente Exemplo",doc:"00000000000",pontos:12500,compras:180000},
+   {nome:"Arquitetura Prime",doc:"11111111111",pontos:36500,compras:510000},
+   {nome:"Construtora Recife",doc:"22222222222",pontos:82000,compras:1520000}
+  ]));
+ }
+ if(!localStorage.getItem("dc_promos")){
+  localStorage.setItem("dc_promos",JSON.stringify([
+   {titulo:"Black Premium",desc:"Compre produtos participantes e avance nas metas para conquistar grandes benefícios.",pontos:10000},
+   {titulo:"Semana do Arquiteto",desc:"Condições especiais para escritórios parceiros e profissionais especificadores.",pontos:3000},
+   {titulo:"Cashback Revestimentos",desc:"Ganhe pontos extras em linhas selecionadas de acabamento.",pontos:5000}
+  ]));
+ }
+ renderAll();
+}
+
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function clean(v){return (v||"").replace(/\D/g,"")}
+function money(v){return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+function pts(v){return Number(v||0).toLocaleString("pt-BR")+" pts"}
+function clientes(){return JSON.parse(localStorage.getItem("dc_clientes")||"[]")}
+function promos(){return JSON.parse(localStorage.getItem("dc_promos")||"[]")}
+
+function consultarCliente(){
+ const doc=clean(document.getElementById("clienteDoc").value);
+ const c=clientes().find(x=>x.doc===doc);
+ const box=document.getElementById("clienteBox");
+ if(!c){box.innerHTML="<hr><b>Cliente não encontrado.</b><p>Fale com a equipe comercial para atualizar seu cadastro.</p>";return;}
+ const meta=metas.find(m=>c.compras<m.valor)||metas[metas.length-1];
+ const falta=Math.max(0,meta.valor-c.compras);
+ const perc=Math.min(100,(c.compras/meta.valor)*100);
+ document.getElementById("homePontos").innerText=pts(c.pontos);
+ document.getElementById("homeBar").style.width=perc+"%";
+ document.getElementById("homeMeta").innerText=`Faltam ${money(falta)} para ${meta.premio}.`;
+ box.innerHTML=`<hr><h3>Olá, ${c.nome}</h3><p><b>Pontos:</b> ${pts(c.pontos)}</p><p><b>Compras acumuladas:</b> ${money(c.compras)}</p><p><b>Próxima meta:</b> ${meta.premio}</p>`;
+}
+
+function loginAdmin(){
+ const u=document.getElementById("adminUser").value;
+ const p=document.getElementById("adminPass").value;
+ if(u==="admin" && p==="1234"){showPage("admin");renderAll();}else{alert("Usuário ou senha incorretos.");}
+}
+function logoutAdmin(){showPage("cliente");}
+
+function salvarCliente(){
+ const arr=clientes();
+ const novo={nome:document.getElementById("nomeCliente").value.trim(),doc:clean(document.getElementById("docCliente").value),pontos:Number(document.getElementById("pontosCliente").value||0),compras:Number(document.getElementById("comprasCliente").value||0)};
+ if(!novo.nome||!novo.doc){alert("Preencha nome e documento.");return;}
+ const i=arr.findIndex(x=>x.doc===novo.doc);
+ if(i>=0)arr[i]=novo;else arr.push(novo);
+ localStorage.setItem("dc_clientes",JSON.stringify(arr));
+ renderAll();alert("Cliente salvo!");
+}
+
+function salvarPromo(){
+ const arr=promos();
+ const nova={titulo:document.getElementById("tituloPromo").value.trim(),desc:document.getElementById("descPromo").value.trim(),pontos:Number(document.getElementById("pontosPromo").value||0)};
+ if(!nova.titulo){alert("Informe o título.");return;}
+ arr.push(nova);localStorage.setItem("dc_promos",JSON.stringify(arr));
+ renderAll();alert("Promoção salva!");
+}
+
+function excluirCliente(doc){
+ if(confirm("Excluir cliente?")){
+  localStorage.setItem("dc_clientes",JSON.stringify(clientes().filter(c=>c.doc!==doc)));
+  renderAll();
+ }
+}
+
+function importarCSV(){
+ const linhas=document.getElementById("csvImport").value.trim().split("\n").filter(Boolean);
+ if(!linhas.length){alert("Cole os dados CSV.");return;}
+ const arr=clientes();
+ linhas.forEach(l=>{
+  const [nome,doc,pontos,compras]=l.split(",").map(x=>(x||"").trim());
+  if(nome&&doc){
+   const novo={nome,doc:clean(doc),pontos:Number(pontos||0),compras:Number(compras||0)};
+   const i=arr.findIndex(x=>x.doc===novo.doc);
+   if(i>=0)arr[i]=novo;else arr.push(novo);
+  }
+ });
+ localStorage.setItem("dc_clientes",JSON.stringify(arr));
+ renderAll();alert("Importação concluída!");
+}
+
+function renderAll(){
+ const cs=clientes(), ps=promos();
+ document.getElementById("promoGrid").innerHTML=ps.map(p=>`<div class="promo-card"><b>${pts(p.pontos)}</b><h3>${p.titulo}</h3><p>${p.desc}</p></div>`).join("");
+ const ordenados=[...cs].sort((a,b)=>b.pontos-a.pontos);
+ document.getElementById("rankingBody").innerHTML=ordenados.map((c,i)=>`<tr><td>#${i+1}</td><td>${c.nome}</td><td>${c.doc}</td><td>${pts(c.pontos)}</td><td>${money(c.compras)}</td><td>${c.compras>=500000?"Premium":"Ativo"}</td></tr>`).join("");
+ document.getElementById("adminClientes").innerHTML=cs.map(c=>`<tr><td>${c.nome}</td><td>${c.doc}</td><td>${pts(c.pontos)}</td><td>${money(c.compras)}</td><td><button onclick="excluirCliente('${c.doc}')" class="btn danger">Excluir</button></td></tr>`).join("");
+ document.getElementById("statClientes").innerText=cs.length;
+ document.getElementById("statPontos").innerText=cs.reduce((s,c)=>s+c.pontos,0).toLocaleString("pt-BR");
+ document.getElementById("statCompras").innerText=money(cs.reduce((s,c)=>s+c.compras,0));
+ document.getElementById("statPromos").innerText=ps.length;
+}
+init();
