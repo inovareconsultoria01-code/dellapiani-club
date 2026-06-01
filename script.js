@@ -44,3 +44,10 @@ function importarCSV(){
 
  alert("Importação concluída!");
 }
+const metas=[
+ {valor:100000,premio:"Moto Elétrica"},
+ {valor:200000,premio:"iPhone 17 Pro"},
+ {valor:500000,premio:"Viagem Internacional / Home Cinema / Energia Solar"},
+ {valor:1500000,premio:"BYD Dolphin / GWM Ora 03 / Kwid E-Tech / JAC E-JS1"},
+ {valor:4000000,premio:"Volvo EX30 / BYD Han / Zeekr X / Xpeng G6"}
+];
