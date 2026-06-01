@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dellapiani Club | Pontos e Promoções</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <div class="brand">
+        <div class="brand-mark">D</div>
+        <div><strong>Dellapiani Club</strong><span>Pontos & Promoções</span></div>
+      </div>
+      <div class="nav-links">
+        <a href="#pontos">Meus pontos</a>
+        <a href="#promocoes">Promoções</a>
+        <a href="#ranking">Ranking</a>
+        <a href="#regulamento">Regulamento</a>
+      </div>
+      <a class="btn btn-gold" href="#pontos">Consultar pontos</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <div class="pill">Campanha exclusiva Dellapiani</div>
+        <h1>Clientes acompanham pontos, metas e promoções em tempo real.</h1>
+        <p>Uma plataforma premium para transformar compras em benefícios, campanhas especiais e recompensas para clientes, arquitetos e parceiros.</p>
+        <div class="hero-actions">
+          <a class="btn btn-gold" href="#pontos">Entrar na área do cliente</a>
+          <a class="btn btn-outline" href="#promocoes">Ver promoções</a>
+        </div>
+        <div class="trust-row">
+          <span>✓ Consulta por CPF/CNPJ</span>
+          <span>✓ Metas de compra</span>
+          <span>✓ Benefícios exclusivos</span>
+        </div>
+      </div>
+      <div class="hero-card glass">
+        <div class="card-top"><span>Saldo disponível</span><strong id="heroPoints">12.500 pts</strong></div>
+        <div class="progress-block">
+          <div class="progress-info"><span>Meta atual</span><b>R$ 200.000</b></div>
+          <div class="progress"><div class="bar" style="width:72%"></div></div>
+          <small>Faltam R$ 20.000 para o próximo benefício</small>
+        </div>
+        <div class="mini-cards">
+          <div><b>3</b><span>Promoções</span></div>
+          <div><b>5</b><span>Prêmios</span></div>
+          <div><b>Top 10</b><span>Ranking</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section stats">
+      <div class="container stats-grid">
+        <div class="stat-card"><span>Clientes ativos</span><b>248</b></div>
+        <div class="stat-card"><span>Pontos gerados</span><b>1.8M</b></div>
+        <div class="stat-card"><span>Campanhas ativas</span><b id="statPromos">3</b></div>
+        <div class="stat-card"><span>Prêmios disponíveis</span><b>5</b></div>
+      </div>
+    </section>
+
+    <section class="section" id="pontos">
+      <div class="container split">
+        <div>
+          <div class="section-label">Área do Cliente</div>
+          <h2>Consulte seus pontos</h2>
+          <p class="muted">Digite seu CPF ou CNPJ para visualizar saldo, compras acumuladas e próxima meta.</p>
+          <div class="client-box">
+            <label>CPF ou CNPJ</label>
+            <input id="docCliente" placeholder="Digite somente números ou com pontuação" />
+            <button class="btn btn-dark" onclick="buscarCliente()">Consultar agora</button>
+            <div id="clienteResultado" class="result-box"></div>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <h3>Resumo do cliente</h3>
+          <div class="dash-row"><span>Pontos acumulados</span><b id="dashPontos">0 pts</b></div>
+          <div class="dash-row"><span>Compras acumuladas</span><b id="dashCompras">R$ 0,00</b></div>
+          <div class="dash-row"><span>Próxima meta</span><b id="dashMeta">R$ 0,00</b></div>
+          <div class="progress light"><div class="bar" id="dashBar"></div></div>
+          <small id="dashFalta">Consulte para ver seu progresso.</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft" id="promocoes">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-label">Campanhas</div>
+            <h2>Promoções da loja</h2>
+            <p class="muted">Benefícios ativos para clientes e parceiros Dellapiani.</p>
+          </div>
+          <a class="btn btn-dark" href="https://wa.me/5581999999999" target="_blank">Falar com consultor</a>
+        </div>
+        <div class="promo-grid" id="promocoesGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="ranking">
+      <div class="container">
+        <div class="section-label">Performance</div>
+        <h2>Ranking de clientes</h2>
+        <p class="muted">Exibição demonstrativa. Na versão final, os dados vêm do banco de dados da loja.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Posição</th><th>Cliente</th><th>Pontos</th><th>Compras</th><th>Status</th></tr></thead>
+            <tbody id="rankingBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft">
+      <div class="container admin-card">
+        <div>
+          <div class="section-label">Painel Administrativo</div>
+          <h2>Cadastrar clientes e promoções</h2>
+          <p class="muted">Versão demonstrativa com armazenamento no navegador. Para uso real, integrar com Firebase, ERP ou planilha.</p>
+        </div>
+        <div class="admin-grid">
+          <div class="form-card">
+            <h3>Novo cliente</h3>
+            <label>Nome</label><input id="nome" placeholder="Nome do cliente">
+            <label>CPF/CNPJ</label><input id="documento" placeholder="Documento">
+            <label>Pontos</label><input id="pontos" type="number" placeholder="Ex: 12500">
+            <label>Compras acumuladas</label><input id="compras" type="number" placeholder="Ex: 180000">
+            <button class="btn btn-dark" onclick="salvarCliente()">Salvar cliente</button>
+          </div>
+          <div class="form-card">
+            <h3>Nova promoção</h3>
+            <label>Título</label><input id="tituloPromo" placeholder="Nome da promoção">
+            <label>Descrição</label><textarea id="descPromo" placeholder="Descreva a campanha"></textarea>
+            <label>Pontos necessários</label><input id="pontosPromo" type="number" placeholder="Ex: 10000">
+            <button class="btn btn-gold" onclick="salvarPromo()">Salvar promoção</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="regulamento">
+      <div class="container regulation">
+        <div class="section-label">Transparência</div>
+        <h2>Regulamento resumido</h2>
+        <details open><summary>Quem pode participar?</summary><p>Clientes pessoa física ou jurídica cadastrados na Dellapiani e com compras válidas durante o período da campanha.</p></details>
+        <details><summary>Como os pontos são calculados?</summary><p>Os pontos são lançados conforme regras internas da campanha, considerando compras faturadas e adimplentes.</p></details>
+        <details><summary>O que não entra na campanha?</summary><p>Compras canceladas, devolvidas, inadimplentes ou fora do período promocional não serão consideradas.</p></details>
+        <details><summary>Entrega dos prêmios</summary><p>Os benefícios serão liberados após validação da meta, conferência cadastral e aprovação comercial.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <a class="whatsapp" href="https://wa.me/5581999999999" target="_blank">WhatsApp</a>
+
+  <footer>
+    <div class="container footer-grid">
+      <div><strong>Dellapiani Club</strong><p>Pontos, promoções e campanhas comerciais.</p></div>
+      <div><p>Recife/PE</p><p>Promoções sujeitas a regulamento.</p></div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
